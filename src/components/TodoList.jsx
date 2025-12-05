@@ -10,9 +10,8 @@ function ListItem({ id, completado, texto, cambiaValor }) {
         type="checkbox"
         checked={completado}
         id={`check-${id}`}
-        // Cuando se le da click al elemento, se llama a la función cambiaValor pasada como prop
-        // Lo correcto sería usar onChange en lugar de onClick para inputs de tipo checkbox
-        onClick={() => cambiaValor()}
+        // Cuando cambia el estado del checkbox, se llama a la función cambiaValor
+        onChange={() => cambiaValor()}
       />
       <span>{texto}</span>
     </li>
