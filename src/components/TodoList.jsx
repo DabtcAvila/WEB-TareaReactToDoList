@@ -1,5 +1,30 @@
 import { useEffect, useState } from "react";
 
+// Componente para el formulario de nuevos elementos
+function NewItemsForm({ onAddTask }) {
+  const [nuevoTexto, setNuevoTexto] = useState("");
+
+  const manejarSubmit = (e) => {
+    e.preventDefault();
+    if (nuevoTexto.trim() !== "") {
+      onAddTask(nuevoTexto.trim());
+      setNuevoTexto("");
+    }
+  };
+
+  return (
+    <form onSubmit={manejarSubmit}>
+      <input
+        type="text"
+        value={nuevoTexto}
+        onChange={(e) => setNuevoTexto(e.target.value)}
+        placeholder="Añadir nueva tarea..."
+      />
+      <button type="submit">Añadir</button>
+    </form>
+  );
+}
+
 // Componente para representar un ítem de la lista
 // Creado como funcion con declaración clásica
 function ListItem({ id, completado, texto, cambiaValor }) {
@@ -10,9 +35,8 @@ function ListItem({ id, completado, texto, cambiaValor }) {
         type="checkbox"
         checked={completado}
         id={`check-${id}`}
-        // Cuando se le da click al elemento, se llama a la función cambiaValor pasada como prop
-        // Lo correcto sería usar onChange en lugar de onClick para inputs de tipo checkbox
-        onClick={() => cambiaValor()}
+        // Cuando cambia el estado del checkbox, se llama a la función cambiaValor
+        onChange={() => cambiaValor()}
       />
       <span>{texto}</span>
     </li>
@@ -40,27 +64,32 @@ export const TodoList = () => {
   }, [tareas]);
 
   // Función para cambiar el estado de una tarea por su ID
-  // Lo correcto sería usar un map en lugar de find y filter para evitar mutaciones directas
+  // Usando map para una implementación más funcional y eficiente
   const cambiaTareaPorId = (id) => {
     setTareas((arregloPrevio) => {
-      let elementoModificado = arregloPrevio.find((item) => item.id === id);
-      elementoModificado = {
-        ...elementoModificado,
-        completado: !elementoModificado.completado,
-      };
-      const restoDeElementos = arregloPrevio.filter(
-        (elemento) => elemento.id !== id
+      return arregloPrevio.map((tarea) =>
+        tarea.id === id
+          ? { ...tarea, completado: !tarea.completado }
+          : tarea
       );
-      restoDeElementos.push(elementoModificado);
-
-      return restoDeElementos.sort();
     });
+  };
+
+  // Función para añadir una nueva tarea
+  const agregarTarea = (textoNuevo) => {
+    const nuevaTarea = {
+      id: Math.max(...tareas.map(t => t.id), 0) + 1,
+      completado: false,
+      texto: textoNuevo
+    };
+    setTareas(tareasAnteriores => [...tareasAnteriores, nuevaTarea]);
   };
 
   return (
     <>
       <div>
         <h1>Todo list</h1>
+        <NewItemsForm onAddTask={agregarTarea} />
         {tareas.map((tarea) => (
           <ListItem
             key={tarea.id}
