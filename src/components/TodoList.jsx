@@ -1,5 +1,30 @@
 import { useEffect, useState } from "react";
 
+// Componente para el formulario de nuevos elementos
+function NewItemsForm({ onAddTask }) {
+  const [nuevoTexto, setNuevoTexto] = useState("");
+
+  const manejarSubmit = (e) => {
+    e.preventDefault();
+    if (nuevoTexto.trim() !== "") {
+      onAddTask(nuevoTexto.trim());
+      setNuevoTexto("");
+    }
+  };
+
+  return (
+    <form onSubmit={manejarSubmit}>
+      <input
+        type="text"
+        value={nuevoTexto}
+        onChange={(e) => setNuevoTexto(e.target.value)}
+        placeholder="Añadir nueva tarea..."
+      />
+      <button type="submit">Añadir</button>
+    </form>
+  );
+}
+
 // Componente para representar un ítem de la lista
 // Creado como funcion con declaración clásica
 function ListItem({ id, completado, texto, cambiaValor }) {
@@ -50,10 +75,21 @@ export const TodoList = () => {
     });
   };
 
+  // Función para añadir una nueva tarea
+  const agregarTarea = (textoNuevo) => {
+    const nuevaTarea = {
+      id: Math.max(...tareas.map(t => t.id), 0) + 1,
+      completado: false,
+      texto: textoNuevo
+    };
+    setTareas(tareasAnteriores => [...tareasAnteriores, nuevaTarea]);
+  };
+
   return (
     <>
       <div>
         <h1>Todo list</h1>
+        <NewItemsForm onAddTask={agregarTarea} />
         {tareas.map((tarea) => (
           <ListItem
             key={tarea.id}
