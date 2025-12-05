@@ -40,20 +40,14 @@ export const TodoList = () => {
   }, [tareas]);
 
   // Función para cambiar el estado de una tarea por su ID
-  // Lo correcto sería usar un map en lugar de find y filter para evitar mutaciones directas
+  // Usando map para una implementación más funcional y eficiente
   const cambiaTareaPorId = (id) => {
     setTareas((arregloPrevio) => {
-      let elementoModificado = arregloPrevio.find((item) => item.id === id);
-      elementoModificado = {
-        ...elementoModificado,
-        completado: !elementoModificado.completado,
-      };
-      const restoDeElementos = arregloPrevio.filter(
-        (elemento) => elemento.id !== id
+      return arregloPrevio.map((tarea) =>
+        tarea.id === id
+          ? { ...tarea, completado: !tarea.completado }
+          : tarea
       );
-      restoDeElementos.push(elementoModificado);
-
-      return restoDeElementos.sort();
     });
   };
 
